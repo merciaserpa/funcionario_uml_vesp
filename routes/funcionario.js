@@ -7,13 +7,20 @@ const departamento = require("../models/funcionario")
 
 //CRRIANDO AS ROTAS
 //1ª ROTA - INSERIR DADOS NA TABELA
-router.get('/store',async(req, res)=>{
+router.post('/store',async(req, res)=>{
     const resultado = await funcionario.create({
-        nome:"Joana Darc",
-        salario:3000,
-        cargo:'Supervisora',
-        departamentoId:1 //Esse campo é a chave estrangeira
+        nome:req.body.nome,
+        salario:req.body.salario,
+        cargo:req.body.cargo,
+        departamentoId:req.body.departamento//Esse campo é a chave estrangeira
     })
+
+    if(resultado){
+        res.redirect('/')
+    }
+    else{
+        res.json({erro:"Os dados não foram cadastrados no banco"})
+    }
 })
 
 //2ª ROTA - EXIBIR A PÁGINQ INICIAL DO FUNCIONÁRIO
@@ -32,5 +39,21 @@ router.get('/show',async(req, res)=>{
         console.log("Não foi possível exibir os dados")
     }
 })
+
+//4ª ROTA - DELETAR DADOS DA TABELA
+//:id significa que iremos passar um valor na rota, ou seja, iremos informar um valor que poderá ser diferente e que será armazenado pela variável :id
+router.get('/destroy/:id',async(req, res)=>{
+    const resultado = await funcionario.destroy ({
+        where:{
+            id:req.params.id// estamos recebendo o id via parâmetro que está sendo passado na rota, no caso, é o :id que estamos recebendo
+        }
+    })
+})
+
+//5° ROTA - EXIBIR FORMULÁRIO DE CADASTRO
+router.get("/create", (req, res)=>{
+    res.render("funcionario/addFuncionario")
+})
+
 
 module.exports = router
