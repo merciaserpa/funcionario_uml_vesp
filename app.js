@@ -26,9 +26,6 @@ const funcionarioRouter = require('./routes/funcionario')
 
     })
 
-
-
-
 //EXECULTANDO O SERVIDOR
 app.listen(porta, ()=>{
     console.log("Servidor executando na porta ", porta)

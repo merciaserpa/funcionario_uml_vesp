@@ -3,7 +3,7 @@ const router = express.Router()
 
 //IMPORTANDO AS TABELAS 
 const funcionario = require("../models/funcionario")
-const departamento = require("../models/funcionario")
+const departamento = require("../models/departamento")
 
 //CRRIANDO AS ROTAS
 //1ª ROTA - INSERIR DADOS NA TABELA
@@ -12,7 +12,7 @@ router.post('/store',async(req, res)=>{
         nome:req.body.nome,
         salario:req.body.salario,
         cargo:req.body.cargo,
-        departamentoId:req.body.departamento//Esse campo é a chave estrangeira
+        departmentoId:req.body.departamento//Esse campo é a chave estrangeira
     })
 
     if(resultado){
@@ -24,16 +24,17 @@ router.post('/store',async(req, res)=>{
 })
 
 //2ª ROTA - EXIBIR A PÁGINQ INICIAL DO FUNCIONÁRIO
-router.get('/',(req, res)=>{
+router.get('/show',(req, res)=>{
     res.send("<h1>Página inicial do funcionário</h1>")
 })
 
 //3ª ROTA - CONSULTAR DADOS DA TABELA   
-router.get('/show',async(req, res)=>{
-    const resultado = await funcionario.findAll()
+router.get('/',async(req, res)=>{
+    const resultado = await funcionario.findAll({include:departamento})// o include:departamento é como o sequelize faz para poder realizar consultas com join
 
     if (resultado){
         console.log(resultado)
+        res.render("funcionario/index", {dados:resultado})
     }
     else{
         console.log("Não foi possível exibir os dados")
@@ -48,11 +49,22 @@ router.get('/destroy/:id',async(req, res)=>{
             id:req.params.id// estamos recebendo o id via parâmetro que está sendo passado na rota, no caso, é o :id que estamos recebendo
         }
     })
+    res.redirect("/")
 })
 
 //5° ROTA - EXIBIR FORMULÁRIO DE CADASTRO
-router.get("/create", (req, res)=>{
-    res.render("funcionario/addFuncionario")
+router.get("/create",async(req, res)=>{
+
+    let resultado = await departamento.findAll()
+
+    if(resultado){
+        res.render("funcionario/addFuncionario",{dados:resultado})
+    }
+    else{
+        console.log ("Não foi possível carregar os dados")
+        res.redirect('/')// reirecionando para a página inicial
+    }
+    
 })
 
 
